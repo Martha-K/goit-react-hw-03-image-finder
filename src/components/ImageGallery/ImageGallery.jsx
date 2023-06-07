@@ -1,8 +1,9 @@
 import { Component } from 'react';
 import { Button } from '../Button/Button';
 import { Modal } from '../Modal/Modal';
-import{List} from './styled'
+import { List } from './styled';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
+import { Loader } from '../Loader/Loader';
 
 const KEY = '35106389-b5a872e61a54744fed1e01881';
 
@@ -13,6 +14,7 @@ export class ImageGallery extends Component {
     showModal: false,
     imageModal: null,
     descriptionPicture: null,
+    loader: false,
   };
 
   fetchImages = () => {
@@ -28,15 +30,24 @@ export class ImageGallery extends Component {
           images: [...prevState.images, ...nextImages],
         }));
       })
+      .then(this.setState({ loader: false }))
       .catch(error => {
         console.log('Error fetching images:', error);
       });
   };
 
+  // onLoader = () => {
+  //   this.setState({
+  //     loader: !this.state.loader
+  //   })
+  // }
+
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.picturesName !== this.props.picturesName) {
       this.setState({ images: [], currentPage: 1 }, () => {
+        this.setState({loader: true})
         this.fetchImages();
+        // this.setState({loader: false})
       });
     }
   }
@@ -53,20 +64,24 @@ export class ImageGallery extends Component {
   };
 
   totalModal = item => {
-    this.setState({ imageModal: item?.largeImageURL });
-    this.setState({ descriptionPicture: item?.tags });
-    this.setState(state => ({
-      showModal: !state.showModal,
-    }));
+    this.setState({
+      imageModal: item?.largeImageURL,
+      descriptionPicture: item?.tags,
+      showModal: !this.state.showModal,
+    });
   };
- 
+
+  onCloseModal = () => {
+    this.setState({ showModal: false });
+  };
 
   render() {
-    const { images, showModal, imageModal, descriptionPicture } = this.state;
+    const { images, showModal, imageModal, descriptionPicture, loader } = this.state;
 
     return (
       <>
         <List>
+          {loader && <Loader />}
           {images.map(item => (
             <ImageGalleryItem
               src={item.webformatURL}
@@ -82,7 +97,7 @@ export class ImageGallery extends Component {
           <Modal
             imageModal={imageModal}
             descriptionPicture={descriptionPicture}
-            onClose={this.totalModal}
+            onClose={this.onCloseModal}
           />
         )}
       </>

@@ -20,6 +20,7 @@ export class Modal extends Component {
       <Overlay onClick={this.props.onClose}>
         <Wrapper>
           <img
+            onClick={e => e.stopPropagation()}
             src={this.props.imageModal}
             alt={this.props.descriptionPicture}
           />
@@ -30,20 +31,3 @@ export class Modal extends Component {
   }
 }
 
-// export const Modal = ({ imageModal, descriptionPicture, onClose }) => {
-//   componentDidMount() {
-//     window.addEventListener('keydown', e => {
-//       if (e.code === 'Escape') {
-//         onClose()
-//       }
-//     } )
-//   }
-//   return createPortal(
-//     <Overlay onClick={onClose}>
-//       <Wrapper>
-//         <img src={imageModal} alt={descriptionPicture} />
-//       </Wrapper>
-//     </Overlay>,
-//     modalRoot
-//   );
-// };
