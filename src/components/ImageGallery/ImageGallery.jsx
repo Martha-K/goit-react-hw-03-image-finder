@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { Button } from '../Button/Button';
 import { Modal } from '../Modal/Modal';
@@ -8,6 +9,9 @@ import { Loader } from '../Loader/Loader';
 const KEY = '35106389-b5a872e61a54744fed1e01881';
 
 export class ImageGallery extends Component {
+  static propTypes = {
+    picturesName: PropTypes.string
+  };
   state = {
     images: [],
     currentPage: 1,
@@ -17,11 +21,13 @@ export class ImageGallery extends Component {
     loader: false,
   };
 
+
   fetchImages = () => {
     const { picturesName } = this.props;
     const { currentPage } = this.state;
     const apiUrl = `https://pixabay.com/api/?q=${picturesName}&page=${currentPage}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`;
 
+    this.setState({ loader: true });
     fetch(apiUrl)
       .then(res => res.json())
       .then(data => {
@@ -30,24 +36,16 @@ export class ImageGallery extends Component {
           images: [...prevState.images, ...nextImages],
         }));
       })
-      .then(this.setState({ loader: false }))
+      .finally(() => this.setState({ loader: false }))
       .catch(error => {
         console.log('Error fetching images:', error);
       });
   };
 
-  // onLoader = () => {
-  //   this.setState({
-  //     loader: !this.state.loader
-  //   })
-  // }
-
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.picturesName !== this.props.picturesName) {
       this.setState({ images: [], currentPage: 1 }, () => {
-        this.setState({loader: true})
         this.fetchImages();
-        // this.setState({loader: false})
       });
     }
   }
@@ -64,6 +62,8 @@ export class ImageGallery extends Component {
   };
 
   totalModal = item => {
+      console.log('this.imageModal', this.imageModal);
+
     this.setState({
       imageModal: item?.largeImageURL,
       descriptionPicture: item?.tags,
@@ -76,7 +76,8 @@ export class ImageGallery extends Component {
   };
 
   render() {
-    const { images, showModal, imageModal, descriptionPicture, loader } = this.state;
+    const { images, showModal, imageModal, descriptionPicture, loader } =
+      this.state;
 
     return (
       <>

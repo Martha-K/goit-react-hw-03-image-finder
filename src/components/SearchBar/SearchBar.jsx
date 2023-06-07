@@ -1,8 +1,16 @@
+import PropTypes from 'prop-types';
 import { Component } from 'react';
 import { ImSearch } from 'react-icons/im';
-
-import {Searchbar,SearchForm,SearchFormButton,SearchFormButtonLabel,Input} from './styled'
+import {
+  Searchbar,
+  SearchForm,
+  SearchFormButton,
+  Input,
+} from './styled';
 export class SearchBar extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func
+  };
   state = {
     picturesName: '',
   };
@@ -11,7 +19,7 @@ export class SearchBar extends Component {
     event.preventDefault();
 
     if (this.state.picturesName === '') {
-      alert('');
+      alert('Error');
       return;
     }
     this.props.onSubmit(this.state.picturesName);
@@ -19,7 +27,9 @@ export class SearchBar extends Component {
   };
 
   handelPicturesName = event => {
-    this.setState({ picturesName: event.currentTarget.value.toLowerCase() });
+    this.setState({
+      picturesName: event.currentTarget.value.toLowerCase().trim(),
+    });
   };
 
   render() {
@@ -29,7 +39,6 @@ export class SearchBar extends Component {
           <SearchForm onSubmit={this.onSubmit}>
             <SearchFormButton type="submit">
               <ImSearch />
-              <SearchFormButtonLabel>Search</SearchFormButtonLabel>
             </SearchFormButton>
 
             <Input
