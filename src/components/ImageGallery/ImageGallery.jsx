@@ -14,6 +14,7 @@ export class ImageGallery extends Component {
   };
   state = {
     images: [],
+    totalImages: null,
     currentPage: 1,
     showModal: false,
     imageModal: null,
@@ -31,6 +32,7 @@ export class ImageGallery extends Component {
     fetch(apiUrl)
       .then(res => res.json())
       .then(data => {
+this.setState({totalImages: data.totalHits})
         const nextImages = data.hits;
         this.setState(prevState => ({
           images: [...prevState.images, ...nextImages],
@@ -76,8 +78,14 @@ export class ImageGallery extends Component {
   };
 
   render() {
-    const { images, showModal, imageModal, descriptionPicture, loader } =
-      this.state;
+    const {
+      images,
+      showModal,
+      imageModal,
+      descriptionPicture,
+      loader,
+      totalImages,
+    } = this.state;
 
     return (
       <>
@@ -93,7 +101,9 @@ export class ImageGallery extends Component {
             />
           ))}
         </List>
-        {images.length > 0 && <Button onNextPage={this.handleLoadMore} />}
+        {totalImages > images.length && (
+          <Button onNextPage={this.handleLoadMore} />
+        )}
         {showModal && (
           <Modal
             imageModal={imageModal}
