@@ -5,12 +5,12 @@ import { Modal } from '../Modal/Modal';
 import { List } from './styled';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import { Loader } from '../Loader/Loader';
+import { fetchPictures } from '../Request/Request';
 
-const KEY = '35106389-b5a872e61a54744fed1e01881';
 
 export class ImageGallery extends Component {
   static propTypes = {
-    picturesName: PropTypes.string
+    picturesName: PropTypes.string,
   };
   state = {
     images: [],
@@ -22,21 +22,23 @@ export class ImageGallery extends Component {
     loader: false,
   };
 
-
   fetchImages = () => {
     const { picturesName } = this.props;
     const { currentPage } = this.state;
-    const apiUrl = `https://pixabay.com/api/?q=${picturesName}&page=${currentPage}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`;
 
     this.setState({ loader: true });
-    fetch(apiUrl)
-      .then(res => res.json())
+    fetchPictures(picturesName, currentPage)
       .then(data => {
-this.setState({totalImages: data.totalHits})
-        const nextImages = data.hits;
-        this.setState(prevState => ({
-          images: [...prevState.images, ...nextImages],
-        }));
+        if (data.total === 0) {
+          this.setState({ loader: false });
+          alert('No results');
+        } else {
+          this.setState({ totalImages: data.totalHits });
+          const nextImages = data.hits;
+          this.setState(prevState => ({
+            images: [...prevState.images, ...nextImages],
+          }));
+        }
       })
       .finally(() => this.setState({ loader: false }))
       .catch(error => {
@@ -50,6 +52,7 @@ this.setState({totalImages: data.totalHits})
         this.fetchImages();
       });
     }
+    console.log('this.state', this.state)
   }
 
   handleLoadMore = () => {
@@ -64,7 +67,7 @@ this.setState({totalImages: data.totalHits})
   };
 
   totalModal = item => {
-      console.log('this.imageModal', this.imageModal);
+    console.log('this.imageModal', this.imageModal);
 
     this.setState({
       imageModal: item?.largeImageURL,
@@ -101,7 +104,7 @@ this.setState({totalImages: data.totalHits})
             />
           ))}
         </List>
-        {totalImages > images.length && (
+        {(totalImages > images.length && images.length > 0) && (
           <Button onNextPage={this.handleLoadMore} />
         )}
         {showModal && (
